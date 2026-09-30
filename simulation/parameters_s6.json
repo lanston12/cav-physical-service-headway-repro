@@ -1,0 +1,87 @@
+{
+  "schema_version": "2.0",
+  "study_label": "S6 evidence-closure simulation parameter set",
+  "fleet": {
+    "vehicle_count": 6,
+    "vehicle_order": ["leader", "F1", "F2", "F3", "F4", "F5"],
+    "mass_kg": [1480, 1550, 1430, 1620, 1510, 1580],
+    "yaw_inertia_kg_m2": [2550, 2760, 2390, 2960, 2630, 2840],
+    "wheelbase_m": [2.72, 2.80, 2.66, 2.88, 2.75, 2.83],
+    "front_axle_fraction": [0.46, 0.45, 0.47, 0.44, 0.46, 0.45],
+    "body_length_m": [4.55, 4.72, 4.45, 4.88, 4.62, 4.78],
+    "body_width_m": [1.80, 1.84, 1.78, 1.88, 1.82, 1.86],
+    "front_cornering_stiffness_N_rad": [76000, 81000, 73000, 85000, 79000, 83000],
+    "rear_cornering_stiffness_N_rad": [80000, 85000, 77000, 89000, 83000, 87000],
+    "actuator_time_constant_s": [0.18, 0.22, 0.20, 0.28, 0.24, 0.26],
+    "brake_effectiveness": [0.94, 0.90, 0.92, 0.86, 0.89, 0.88]
+  },
+  "road_and_operation": {
+    "reference_speed_mps": 25.0,
+    "standstill_gap_m": 3.0,
+    "lane_width_m": 3.6,
+    "curvature_grid_m_inv": [0.0, 0.0125],
+    "friction_grid": [0.4, 1.0],
+    "nominal_friction": 0.8,
+    "simulation_step_s": 0.1,
+    "episode_duration_s": 35.0
+  },
+  "local_sensor": {
+    "range_error_bound_m": 0.20,
+    "relative_speed_error_bound_mps": 0.10,
+    "update_period_s": 0.1,
+    "latency_s": 0.05,
+    "detection_range_m": 150.0
+  },
+  "physical_boundary": {
+    "controller_deadline_allowance_s": 0.08,
+    "actuator_settling_multiplier": 2.3,
+    "longitudinal_disturbance_bound_mps2": 0.15,
+    "lateral_disturbance_bound_mps2": 0.25,
+    "heading_error_bound_rad": 0.05,
+    "lateral_error_bound_m": 0.30,
+    "headway_search_grid_s": [0.4, 4.0],
+    "operational_headway_limit_s": 2.8,
+    "headway_grid_step_s": 0.05,
+    "space_filling_samples_per_cell": 512,
+    "sobol_seed": 62026
+  },
+  "controller": {
+    "acceleration_min_mps2": -7.5,
+    "acceleration_max_mps2": 2.5,
+    "steering_limit_rad": 0.35,
+    "maximum_packet_age_s": 1.0,
+    "cacc_kp": 0.35,
+    "cacc_kd": 0.80,
+    "cacc_feedforward": 0.85,
+    "lqr_state_weights": [2.5, 20.0, 0.25],
+    "lqr_input_weight": 0.35,
+    "safety_filter_alpha": 0.85,
+    "robust_baseline_assumed_mu": 0.8,
+    "robust_baseline_assumed_curvature_m_inv": 0.0,
+    "zheng_k1": 0.35,
+    "zheng_k2": 0.80,
+    "event_acceleration_threshold_mps2": 0.25,
+    "event_max_silence_s": 0.50
+  },
+  "communication": {
+    "nominal": {"loss_probability": 0.02, "burst_persistence": 0.10, "maximum_delay_steps": 1},
+    "moderate": {"loss_probability": 0.20, "burst_persistence": 0.55, "maximum_delay_steps": 2},
+    "severe": {"loss_probability": 0.65, "burst_persistence": 0.92, "maximum_delay_steps": 5},
+    "representative_outage_s": [10.0, 18.0]
+  },
+  "service_thresholds": {
+    "gap_rmse_m": 0.75,
+    "speed_rmse_mps": 1.40,
+    "lateral_rmse_m": 0.20,
+    "jerk_rms_mps3": 4.0,
+    "computation_deadline_s": 0.10,
+    "minimum_safe_margin_m": 0.0,
+    "required_success_fraction": 0.80
+  },
+  "monte_carlo": {
+    "service_seeds": [3101, 3102, 3103, 3104, 3105, 3106, 3107, 3108, 3109, 3110, 3111, 3112, 3113, 3114, 3115, 3116, 3117, 3118, 3119, 3120, 3121, 3122, 3123, 3124, 3125, 3126, 3127, 3128, 3129, 3130, 3131, 3132, 3133, 3134, 3135, 3136, 3137, 3138, 3139, 3140, 3141, 3142, 3143, 3144, 3145, 3146, 3147, 3148, 3149, 3150],
+    "resource_seeds": [4101, 4102, 4103, 4104, 4105, 4106, 4107, 4108, 4109, 4110, 4111, 4112, 4113, 4114, 4115, 4116, 4117, 4118, 4119, 4120, 4121, 4122, 4123, 4124, 4125, 4126, 4127, 4128, 4129, 4130, 4131, 4132, 4133, 4134, 4135, 4136, 4137, 4138, 4139, 4140, 4141, 4142, 4143, 4144, 4145, 4146, 4147, 4148, 4149, 4150],
+    "delay_seeds": [5101, 5102, 5103, 5104, 5105, 5106, 5107, 5108, 5109, 5110, 5111, 5112, 5113, 5114, 5115, 5116, 5117, 5118, 5119, 5120, 5121, 5122, 5123, 5124, 5125, 5126, 5127, 5128, 5129, 5130],
+    "ablation_seeds": [6101, 6102, 6103, 6104, 6105, 6106, 6107, 6108, 6109, 6110, 6111, 6112, 6113, 6114, 6115, 6116, 6117, 6118, 6119, 6120, 6121, 6122, 6123, 6124, 6125, 6126, 6127, 6128, 6129, 6130]
+  }
+}

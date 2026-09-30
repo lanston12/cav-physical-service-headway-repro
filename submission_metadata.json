@@ -1,0 +1,24 @@
+{
+  "title": "Separating physical safety from communication service in connected automated vehicle platoons: Curvature–friction headway boundaries",
+  "authors_in_order": [
+    "Jianbo Feng",
+    "Bingying Guo",
+    "Zepeng Gao",
+    "Hongbin Ren",
+    "Yanxue Wang",
+    "Zhenkun Guo"
+  ],
+  "corresponding_author": "Jianbo Feng",
+  "corresponding_email": "fengjianbo@bucea.edu.cn",
+  "reproduction_repository": "https://github.com/lanston12/cav-physical-service-headway-repro",
+  "author_source": "User-provided metadata, September 29, 2026",
+  "missing_optional_metadata": [
+    "Bingying Guo email",
+    "ORCIDs (not supplied)"
+  ],
+  "remaining_upload_items": [
+    "Corresponding author to confirm originality, exclusive submission and all-author approval in the submission system"
+  ],
+  "scientific_state": "Frozen; no simulation or baseline added during closure",
+  "correspondence_source": "User correction, September 29, 2026"
+}
