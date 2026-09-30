@@ -39,12 +39,21 @@ DISPLAY_NAMES = {
     "Proposed": "Proposed",
 }
 
+LINE_STYLES = {
+    "CACC": "-",
+    "Switching DMPC": "--",
+    "Robust DMPC": "-.",
+    "Zheng et al. (2024)": ":",
+    "Proposed": (0, (5, 1.4, 1, 1.4)),
+}
+
 def style():
     mpl.rcParams.update({
         "font.family": "serif", "font.size": 8.5, "axes.labelsize": 9,
         "axes.titlesize": 9.5, "legend.fontsize": 7.2, "xtick.labelsize": 8,
         "ytick.labelsize": 8, "axes.linewidth": 0.8, "lines.linewidth": 1.6,
         "savefig.bbox": "tight", "pdf.fonttype": 42, "ps.fonttype": 42,
+        "hatch.linewidth": 0.45,
     })
 
 
@@ -126,7 +135,7 @@ def render_p2():
     ax.contourf(k, mu, np.where(status == 1, 1, np.nan), levels=[0.5, 1.5],
                 colors=["#d7d7d7"], hatches=["///"], alpha=1.0)
     ax.contourf(k, mu, np.where(status == 2, 1, np.nan), levels=[0.5, 1.5],
-                colors=["#777777"], hatches=["xx"], alpha=1.0)
+                colors=["#bdbdbd"], hatches=["x"], alpha=1.0)
     finite = np.where(np.isfinite(H), H, max_grid + 0.2)
     ax.contour(k, mu, finite, levels=[operational], colors="black", linewidths=2.3)
     ax.contour(k, mu, finite, levels=[operational], colors="white", linewidths=1.1)
@@ -135,7 +144,7 @@ def render_p2():
     handles = [
         Patch(facecolor="#d7d7d7", edgecolor="#555555", hatch="///",
               label=r"$\widehat h_{\min}^{\rm num}>4.0$ s"),
-        Patch(facecolor="#777777", edgecolor="#333333", hatch="xx",
+        Patch(facecolor="#bdbdbd", edgecolor="#444444", hatch="x",
               label="Insufficient braking capability"),
         Line2D([], [], color="black", linewidth=2.0, label="2.8 s operating limit"),
     ]
@@ -174,8 +183,10 @@ def render_p3():
         mesh = ax.pcolormesh(xe, ye, Z, cmap=cmap, vmin=0, vmax=1, shading="flat")
         passmask = np.where(np.isfinite(Z), (Z >= 0.80).astype(float), np.nan)
         if np.nanmin(passmask) <= 0.5 <= np.nanmax(passmask):
+            ax.contour(headways, budgets, passmask, levels=[0.5], colors="#1f1f1f",
+                       linewidths=3.0, corner_mask=False)
             ax.contour(headways, budgets, passmask, levels=[0.5], colors="white",
-                       linewidths=1.25, corner_mask=False)
+                       linewidths=1.3, corner_mask=False)
         ax.axvline(physical, color="black", linestyle="--", linewidth=1.1)
         for y in np.arange(0.5, 3.6, 1):
             ax.axhline(y, color="white", linewidth=0.45, alpha=0.8)
@@ -186,10 +197,7 @@ def render_p3():
     axes[0].set_ylabel("Attempt budget per sample")
     cb = fig.colorbar(mesh, ax=axes, pad=0.02, fraction=0.025)
     cb.set_label(r"Estimated service probability $\widehat p_{\rm svc}$")
-    fig.text(0.5, 0.01,
-             "Budgets are discrete rows; dashed: numerical physical boundary; white: 0.80 cell boundary; gray: physically infeasible",
-             ha="center", fontsize=6.7)
-    fig.subplots_adjust(bottom=0.20, wspace=0.12, right=0.88)
+    fig.subplots_adjust(bottom=0.16, wspace=0.12, right=0.88)
     save(fig, "S6_P3_physical_service_probability")
 
 
@@ -199,9 +207,10 @@ def render_p4():
     fig, axes = plt.subplots(2, 2, figsize=(7.2, 5.0), sharex=True)
     for tr in traces:
         name, color = tr.method.iloc[0], COLORS[tr.method.iloc[0]]
-        axes[0, 0].plot(tr.time_s, tr.gap_f1_m, label=DISPLAY_NAMES[name], color=color)
-        axes[0, 1].plot(tr.time_s, tr.minimum_safe_margin_m, label=DISPLAY_NAMES[name], color=color)
-        axes[1, 0].plot(tr.time_s, tr.f1_speed_mps, label=DISPLAY_NAMES[name], color=color)
+        line_style = LINE_STYLES[name]
+        axes[0, 0].plot(tr.time_s, tr.gap_f1_m, label=DISPLAY_NAMES[name], color=color, linestyle=line_style)
+        axes[0, 1].plot(tr.time_s, tr.minimum_safe_margin_m, label=DISPLAY_NAMES[name], color=color, linestyle=line_style)
+        axes[1, 0].plot(tr.time_s, tr.f1_speed_mps, label=DISPLAY_NAMES[name], color=color, linestyle=line_style)
     prop = traces[-1]
     axes[0, 0].plot(prop.time_s, prop.safe_gap_f1_m, color="black", linestyle="--", linewidth=1.2, label="Required gap")
     axes[1, 0].plot(prop.time_s, prop.leader_speed_mps, color="black", linestyle="--", linewidth=1.2, label="Leader")
@@ -212,6 +221,7 @@ def render_p4():
     for ax in axes.flat:
         ax.axvspan(10, 18, color="#bdbdbd", alpha=0.25, linewidth=0)
         ax.spines[["top", "right"]].set_visible(False)
+    axes[0, 1].axhline(0, color="#202020", linewidth=0.9, linestyle=(0, (3, 2)), zorder=5)
     frac_ax.spines["top"].set_visible(False)
     axes[0, 0].set_ylabel("Follower 1 bumper gap (m)")
     axes[0, 1].set_ylabel("Minimum safety margin (m)")
@@ -228,8 +238,9 @@ def render_p4():
     age_ax.legend([age_line, frac_line], ["Mean packet age", "Available fraction"],
                   frameon=False, loc="lower center", bbox_to_anchor=(0.5, 1.01), ncol=2,
                   borderaxespad=0.0, fontsize=6.7)
-    axes[0, 1].text(0.50, 0.08, "shaded: complete V2V unavailability",
-                    transform=axes[0, 1].transAxes, ha="center", fontsize=7.2)
+    axes[0, 1].text(14, 24.0, "V2V\nunavailable\n10–18 s",
+                    ha="center", va="top", fontsize=7.2,
+                    bbox={"facecolor": "white", "edgecolor": "none", "alpha": 0.75, "pad": 1.0})
     fig.subplots_adjust(top=0.84, wspace=0.34, hspace=0.24)
     save(fig, "S6_P4_emergency_braking_v2v_unavailability")
 
@@ -237,7 +248,7 @@ def render_p4():
 def render_p6():
     summary = pd.read_csv(DATA / "S6_P6_resource_summary.csv")
     order = ["Periodic", "Reduced rate", "Fixed event trigger", "Aware B=1", "Aware B=2", "Aware B=3"]
-    markers = ["s", "D", "^", "o", "o", "o"]
+    markers = ["s", "D", "^", "o", "P", "X"]
     colors = ["#666666", "#D17C0B", "#009E73", "#56B4E9", "#0072B2", "#003F5C"]
     fig, ax = plt.subplots(figsize=(5.8, 3.65))
 
@@ -247,17 +258,16 @@ def render_p6():
             target.errorbar(r.packet_mean, r.score_mean, xerr=1.96 * r.packet_sem,
                             yerr=1.96 * r.score_sem, fmt=marker, color=color, capsize=2.2,
                             label=("Fixed threshold (generic)" if label == "Fixed event trigger" else label) if labels else None)
-        aware = summary[summary.policy.str.startswith("Aware")].sort_values("packet_mean")
-        target.plot(aware.packet_mean, aware.score_mean, color="#0072B2", alpha=0.55, linewidth=1.0)
+        # Slot budgets are discrete policies, so their markers are not joined.
 
     plot_points(ax, True)
     ax.set(xlabel="Attempted packets (vehicle-km$^{-1}$)",
            ylabel="Combined tracking score (lower is better)")
-    fig.legend(*ax.get_legend_handles_labels(), frameon=False, ncol=3, loc="upper center", bbox_to_anchor=(0.5, 0.995), columnspacing=1.1, handletextpad=0.4)
-    fig.subplots_adjust(top=0.80, bottom=0.15, left=0.14, right=0.98)
+    fig.legend(*ax.get_legend_handles_labels(), frameon=False, ncol=3, loc="upper center", bbox_to_anchor=(0.5, 1.00), columnspacing=1.1, handletextpad=0.4)
+    fig.subplots_adjust(top=0.76, bottom=0.15, left=0.14, right=0.98)
     ax.set_ylim(2.45, 3.11)
     ax.spines[["top", "right"]].set_visible(False)
-    ins = inset_axes(ax, width="45%", height="36%", loc="upper right", borderpad=1.1)
+    ins = inset_axes(ax, width="43%", height="33%", loc="upper right", borderpad=1.1)
     plot_points(ins, False)
     ins.set_xlim(60, 390)
     ins.set_ylim(2.472, 2.502)
